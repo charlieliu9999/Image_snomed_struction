@@ -35,10 +35,10 @@ class SnomedEntity:
         for child in self.children:
             if isinstance(child, SnomedEntity):
                 ret += child.__str__(level + 1)
-            else: 
+            else:
                 ret += "\t" * (level + 1) + str(child) + "\n"
         return ret
-    
+
     def __repr__(self):
         return f"SnomedEntity(term='{self.term}', code='{self.code}', children_count={len(self.children)})"
 
@@ -77,9 +77,9 @@ class LoincTerm:
         return cls(term=data.get("term"), code=data.get("code"))
 
 class ImagingReport:
-    def __init__(self, patient_info: PatientInfo, chief_complaint: str, 
-                 examination_requested: str, imaging_findings: str, 
-                 diagnostic_impression: str, snomed_entities: List[SnomedEntity] = None, 
+    def __init__(self, patient_info: PatientInfo, chief_complaint: str,
+                 examination_requested: str, imaging_findings: str,
+                 diagnostic_impression: str, snomed_entities: List[SnomedEntity] = None,
                  loinc_code: Optional[LoincTerm] = None, timestamp: str = None): # Changed SnomedEntity list type hint
         self.patient_info = patient_info
         self.chief_complaint = chief_complaint
@@ -118,7 +118,7 @@ class ImagingReport:
         patient_info_data = data.get("patient_info")
         snomed_data = data.get("snomed_entities", [])
         loinc_data = data.get("loinc_code")
-        
+
         return cls(
             patient_info=PatientInfo.from_dict(patient_info_data) if patient_info_data else None,
             chief_complaint=data.get("chief_complaint"),
@@ -131,7 +131,7 @@ class ImagingReport:
         )
 
 class ReportAnalysis:
-    def __init__(self, report: ImagingReport, gemini_analysis_summary: str, 
+    def __init__(self, report: ImagingReport, gemini_analysis_summary: str,
                  structured_tree_output: str):
         self.report = report
         self.gemini_analysis_summary = gemini_analysis_summary

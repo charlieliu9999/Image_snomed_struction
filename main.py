@@ -1,13 +1,13 @@
 from models import ImagingReport, PatientInfo, SnomedEntity, LoincTerm, ReportAnalysis # Added ReportAnalysis
 from terminology_services import extract_snomed_entities_from_text, get_loinc_code_for_examination, translate_term, analyze_text_with_gemini
-from utils import build_snomed_tree 
+from utils import build_snomed_tree
 from history_manager import save_analysis, load_all_analyses # Import history functions
 from typing import List, Optional # Added Optional for type hinting
 import io # For capturing print output of the tree
 
 def display_full_analysis(analysis: ReportAnalysis) -> None:
     """Displays a single ReportAnalysis object in a structured format."""
-    
+
     print("\n==================================================")
     print("PATIENT AND EXAMINATION INFO")
     print("==================================================")
@@ -16,7 +16,7 @@ def display_full_analysis(analysis: ReportAnalysis) -> None:
         print(f"Patient Sex: {analysis.report.patient_info.sex}")
     else:
         print("Patient Info: N/A")
-        
+
     if analysis.report:
         print(f"Examination Requested: {analysis.report.examination_requested}")
         translated_loinc_term = "N/A"
@@ -53,13 +53,13 @@ def display_full_analysis(analysis: ReportAnalysis) -> None:
             print(f"- {entity.term} ({entity.code}) - [{translate_term(entity.term, 'zh')}]")
     else:
         print("No SNOMED entities found in the report.")
-    
+
     print("\n--- SNOMED CT Hierarchy (from Findings & Impression) ---")
     if analysis.structured_tree_output and analysis.structured_tree_output.strip():
         print(analysis.structured_tree_output)
     else:
         print("No hierarchical tree output available for SNOMED entities.")
-        
+
     print("\n==================================================")
     print("GEMINI LLM ANALYSIS")
     print("==================================================")
@@ -128,7 +128,7 @@ if __name__ == "__main__":
             print(f"    - {entity.term} ({entity.code}), Relationships: {entity.relationships}")
             # translated_term = translate_term(entity.term, target_language="zh") # Translation can be done after tree if needed
             # print(f"    Chinese Translation: {translated_term}")
-        
+
         print("\n  SNOMED Entity Tree (Findings):")
         snomed_tree_findings: List[SnomedEntity] = build_snomed_tree(flat_snomed_entities_findings)
         if snomed_tree_findings:
@@ -169,7 +169,7 @@ if __name__ == "__main__":
         print(f"  Found LOINC Code: {report.loinc_code.term} (Code: {report.loinc_code.code})")
     else:
         print("  No LOINC code found for the examination requested.")
-    
+
     # Store flat list of SNOMED entities in the report object
     report.snomed_entities = flat_snomed_entities_findings + flat_snomed_entities_impression # Combine if needed, or handle separately
 
@@ -182,7 +182,7 @@ if __name__ == "__main__":
     # For demonstration, we'll use the findings tree string for structured_tree_output
     # and the general summary for gemini_analysis_summary.
     # In a real scenario, you might generate a dedicated summary for the whole report.
-    
+
     snomed_tree_output_string = ""
     if snomed_tree_findings:
         # Capture the print output of the tree to a string
@@ -193,17 +193,17 @@ if __name__ == "__main__":
             # or have a dedicated to_tree_string() method.
             # For now, we assume __str__ prints to stdout and we capture it.
             # A better way: snomed_tree_output_string += str(root_node)
-            tree_string_io.write(str(root_node)) 
+            tree_string_io.write(str(root_node))
         snomed_tree_output_string = tree_string_io.getvalue()
         tree_string_io.close()
-    
+
     # Create ReportAnalysis object
     current_analysis = ReportAnalysis(
         report=report,
-        gemini_analysis_summary=gemini_summary, 
-        structured_tree_output=snomed_tree_output_string 
+        gemini_analysis_summary=gemini_summary,
+        structured_tree_output=snomed_tree_output_string
     )
-    
+
     # Display the full analysis of the current report
     print("\n--- Displaying Full Analysis of Current Report ---")
     display_full_analysis(current_analysis)

@@ -14,12 +14,12 @@ def save_analysis(analysis: ReportAnalysis, history_dir: str = HISTORY_DIR) -> N
         os.makedirs(history_dir, exist_ok=True)
 
     analysis_dict = analysis.to_dict()
-    
+
     # Ensure timestamp is a string and suitable for a filename
     report_timestamp_str = analysis.report.timestamp
     if isinstance(report_timestamp_str, datetime): # Should already be string from model
         report_timestamp_str = report_timestamp_str.isoformat()
-    
+
     # Sanitize timestamp for filename
     safe_timestamp = report_timestamp_str.replace(":", "-").replace("T", "_").split(".")[0] # Basic sanitization
     filename = f"analysis_{safe_timestamp}.json"
@@ -58,5 +58,5 @@ def load_all_analyses(history_dir: str = HISTORY_DIR) -> List[ReportAnalysis]:
                 print(f"Error reading file {filepath}: {e}")
             except Exception as e: # Catch other potential errors during object reconstruction
                 print(f"Error reconstructing analysis from {filepath}: {e}")
-    
+
     return analyses
